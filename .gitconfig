@@ -1,0 +1,65 @@
+[includeIf "gitdir:~/git/"]
+    path = ~/.gitconfig-tuks
+
+[includeIf "gitdir:~/class/"]
+    path = ~/.gitconfig-epita
+
+[includeIf "gitdir:~/projects/"]
+    path = ~/.gitconfig-epita
+
+[github]
+	user = Tuksiranium
+	token = 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
+	
+[credential]
+	helper = store
+
+[push]
+	default = simple
+
+[color]
+	ui = true
+
+[core]
+	PAGER=cat
+
+[user]
+	email = tuksiranium@gmail.com
+
+[alias]
+    st = status
+    ca = commit -a
+	cm = commit -m
+	cam = commit -am
+    b = branch
+    bt = branch --track
+    co = checkout
+    cob = checkout -b
+    cobt = checkout -b --track
+    d = diff
+    l = log
+    lp = log -p
+    ls = log --stat
+    lr = log --raw
+    lg = log --graph
+    lo = log --pretty=oneline
+	la = log --graph --oneline --all
+    f = fetch
+    ph = push
+    pl = pull
+    r = remote
+    rs = remote show
+    ra = remote add
+    rd = remote del
+    lsf = ls-files
+    m = merge
+    cl = clean -fd
+    t = tag
+    ui = update-index
+	sw = switch
+
+[merge]
+	tool = fugitive
+
+[mergetool "fugitive"]
+	cmd = vim -f -c "Gvdiffsplit!" "$MERGED"

@@ -12,7 +12,6 @@ if empty(glob("~/.vim/autoload/plug.vim"))
 endif
 
 
-
 call plug#begin('~/.vim/plugged')
 
 Plug 'vim-airline/vim-airline'
@@ -24,13 +23,20 @@ Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'mattn/vim-lsp-settings'
 
+Plug 'mileszs/ack.vim'
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'romainl/vim-qf'
+
+Plug 'tpope/vim-fugitive'
+
 call plug#end()
 
 
 filetype indent plugin on
 syntax on
 
-"set cc=80
+" variables
+set cc=80
 set number
 set relativenumber
 "set expandtab
@@ -56,11 +62,35 @@ set smartcase
 set incsearch
 set nohlsearch
 
-noremap <leader>cw :botright :cw<cr>
+
+" mapping
+
+let g:ack_apply_qmappings = 0
+let g:ack_apply_lmappings = 0
+let g:qf_mapping_ack_style = 1
+
+nmap ç <Plug>(qf_qf_switch)
+nmap <F5> <Plug>(qf_qf_toggle)
+nmap <F6> <Plug>(qf_loc_toggle)
+
+let g:nremap = {"[q": "", "]q": "", "[l": "", "]l": ""}
+nmap [q <Plug>(qf_qf_previous)
+nmap ]q <Plug>(qf_qf_next)
+nmap [l <Plug>(qf_loc_previous)
+nmap ]l <Plug>(qf_loc_next)
+
+noremap <leader>co :botright :copen<cr>
 noremap <leader>m :silent! :make! \| :redraw!<cr>
 
-" Make configuration
+map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+map <F7> :vs <CR>:exec("tag ".expand("<cword>"))<CR>
+
+
+" Filetype configuration
 autocmd Filetype make setlocal shiftwidth=8 tabstop=8
+
+
+" theming congig
 
 set list
 set listchars=tab:>-,eol:¬,trail:\ ,nbsp:¤
@@ -77,6 +107,9 @@ let g:airline_powerline_fonts = 1
 let g:airline_theme='jellybeans'
 let g:jellybeans_background_color_256='232'
 
+
+" git config
+
 " per .git vim configs
 " just `git config vim.settings "expandtab sw=4 sts=4"` in a git repository
 " change syntax settings for this repository
@@ -85,8 +118,10 @@ if strlen(git_settings)
 	exe "set" git_settings
 endif
 
+
 " autocomplete configuration
 
+" disable autopopup autocomplete win
 let g:asyncomplete_auto_popup = 0
 
 function! s:check_back_space() abort
@@ -100,5 +135,16 @@ inoremap <silent><expr> <TAB>
   \ asyncomplete#force_refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-"let g:lsp_fold_enabled = 0
+" some personal config
 let g:lsp_diagnostics_enabled = 0
+let g:lsp_document_code_action_signs_enabled = 0
+
+
+" fugitiv config
+noremap <leader>gs :Git<cr>
+
+
+" add THE BEauTIfUl vim debugger
+if version >= 801
+    packadd termdebug
+endif
