@@ -26,8 +26,10 @@ Plug 'mattn/vim-lsp-settings'
 Plug 'mileszs/ack.vim'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'romainl/vim-qf'
+Plug 'tpope/vim-vinegar'
 
 Plug 'tpope/vim-fugitive'
+Plug 'vim-test/vim-test'
 
 call plug#end()
 
@@ -39,9 +41,9 @@ syntax on
 set cc=80
 set number
 set relativenumber
-"set expandtab
+set expandtab
 set shiftwidth=4
-"set softtabstop=4
+set softtabstop=4
 set tabstop=4
 set smarttab
 set smartindent
@@ -51,6 +53,7 @@ set backspace=eol,start,indent
 set clipboard=unnamedplus
 set belloff=all
 set mouse=a
+set scrolloff=5
 set cursorline
 set wildmenu
 set wildmode=longest:full,list:full
@@ -90,6 +93,20 @@ map <F7> :vs <CR>:exec("tag ".expand("<cword>"))<CR>
 autocmd Filetype make setlocal shiftwidth=8 tabstop=8
 
 
+" auto complete matching ponct.
+inoremap { {}<Esc>ha
+inoremap {<CR> {<CR>}<Esc>ko
+inoremap ( ()<Esc>ha
+inoremap (<CR> (<CR>)<Esc>ko
+inoremap () ()
+inoremap [ []<Esc>ha
+inoremap [<CR> [<CR>]<Esc>ko
+inoremap [] []
+inoremap " ""<Esc>ha
+"inoremap ' ''<Esc>ha
+inoremap ` ``<Esc>ha
+
+
 " theming congig
 
 set list
@@ -103,7 +120,7 @@ set background=dark
 set fillchars=vert:│
 
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_powerline_fonts = 1
+let g:airline_powerline_fonts = 0
 let g:airline_theme='jellybeans'
 let g:jellybeans_background_color_256='232'
 
@@ -143,6 +160,9 @@ let g:lsp_document_code_action_signs_enabled = 0
 " fugitiv config
 noremap <leader>gs :Git<cr>
 
+
+" vinegar config
+let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+'
 
 " add THE BEauTIfUl vim debugger
 if version >= 801
