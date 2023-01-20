@@ -4,26 +4,25 @@ BINDIR            := bin
 MAINDIR           := main
 TESTDIR           := test
 
-SRCDIR             = ${MAINDIR}/src
-INCDIR             = ${MAINDIR}/include
-PROJECT_TEST_NAME := ${PROJECT_NAME}.test
-PROJECT_PATH       = ${BINDIR}/${PROJECT_NAME}
-PROJECT_TEST_PATH  = ${BINDIR}/${PROJECT_TEST_NAME}
+SRCDIR             = "${MAINDIR}/src"
+INCDIR             = "${MAINDIR}/include"
+PROJECT_TEST_NAME  = "${PROJECT_NAME}.test"
+PROJECT_PATH       = "${BINDIR}/${PROJECT_NAME}"
+PROJECT_TEST_PATH  = "${BINDIR}/${PROJECT_TEST_NAME}"
 
-GENERATOR         := make
-GEN_CMAKE_NAME    := 'Unix Makefiles'
+GENERATOR         := ninja
+GEN_CMAKE_NAME    := Ninja
 
 COMPILE_MODE      := Debug
+EXPORT_COMPILE_COMMANDS := 1
 
 
 # BUILD & RUN ----------------------------------------------------
 .PHONY: all build ctest run run_test
 
 all: build
-build: ${PROJECT_PATH} | ${PROJECT_TEST_PATH}
 
-${PROJECT_PATH}:
-${PROJECT_TEST_PATH}:
+build: compile_commands.json
 	@${GENERATOR} -C ${BINDIR}
 
 run: build
@@ -35,28 +34,39 @@ ctest: build
 #-----------------------------------------------------------------
 
 # UTILS ----------------------------------------------------------
-.PHONY: clean clean_all mk_compile_flags
+.PHONY: clean clean_all reconfigure
 
 clean:
 	@${GENERATOR} -C ${BINDIR} clean
+	@rm "compile_commands.json"
 
 clean_all:
 	@rm -rf ${BINDIR}
+	@rm "compile_commands.json"
 
-mk_compile_flags:
-	@echo -e "-I\n./${INCDIR}\n-I\n./" > compile_flags.txt
+compile_commands.json:
+ifeq (${EXPORT_COMPILE_COMMANDS}, 1)
+	@ln -s "./${BINDIR}/compile_commands.json" .
+endif
+
+reconfigure:
+	@cmake -S . -B ${BINDIR}                     \
+		-G ${GEN_CMAKE_NAME}                 \
+		-DCMAKE_BUILD_TYPE=${COMPILE_MODE}   \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=${EXPORT_COMPILE_COMMANDS} \
+		--fresh
 #-----------------------------------------------------------------
 
 # INITIALISATION -------------------------------------------------
 .PHONY: init configure
 
-init: .git configure ${SRCDIR} ${INCDIR} ${TESTDIR}
+init: .git ${SRCDIR} ${INCDIR} ${TESTDIR} ${SRCDIR}/main.cpp configure 
 
-configure: ${MAINDIR}/main.cpp
+configure:
 	@cmake -S . -B ${BINDIR}                     \
 		-G ${GEN_CMAKE_NAME}                 \
 		-DCMAKE_BUILD_TYPE=${COMPILE_MODE}   \
-		--fresh
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=${EXPORT_COMPILE_COMMANDS}
 
 .git: .gitignore
 	@git init
@@ -72,7 +82,7 @@ ${SRCDIR} ${INCDIR} ${TESTDIR}:
 	mkdir -p $@
 
 CMakeLists.txt:
-	@curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/CMakeLists-CPP' > $@
+	@curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/cpp_templ2/CMakeLists.txt' > $@
 
 ${SRCDIR}/main.cpp:
 	@curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/main.cpp' > $@
