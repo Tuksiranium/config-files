@@ -10,26 +10,27 @@ PROJECT_TEST_NAME  = "${PROJECT_NAME}.test"
 PROJECT_PATH       = "${BINDIR}/${PROJECT_NAME}"
 PROJECT_TEST_PATH  = "${BINDIR}/${PROJECT_TEST_NAME}"
 
-GENERATOR         := ninja
-GEN_CMAKE_NAME    := Ninja
+GENERATOR         := make
+GEN_CMAKE_NAME    := 'Unix Makefiles'
 
 COMPILE_MODE      := Debug
 EXPORT_COMPILE_COMMANDS := 1
 
 
 # BUILD & RUN ----------------------------------------------------
-.PHONY: all build ctest run run_test
-
+.PHONY: all build run run_test ctest 
 all: build
 
 build: compile_commands.json
 	@${GENERATOR} -C ${BINDIR}
 
-run: build
+run:
 	@./${PROJECT_PATH}
-run_test: build
+
+run_test:
 	@./${PROJECT_TEST_PATH}
-ctest: build
+
+ctest:
 	@(cd "${BINDIR}"; ctest)
 #-----------------------------------------------------------------
 
@@ -38,11 +39,11 @@ ctest: build
 
 clean:
 	@${GENERATOR} -C ${BINDIR} clean
-	@rm "compile_commands.json"
+	@rm -f "compile_commands.json"
 
 clean_all:
 	@rm -rf ${BINDIR}
-	@rm "compile_commands.json"
+	@rm -f "compile_commands.json"
 
 compile_commands.json:
 ifeq (${EXPORT_COMPILE_COMMANDS}, 1)
@@ -60,7 +61,7 @@ reconfigure:
 # INITIALISATION -------------------------------------------------
 .PHONY: init configure
 
-init: .git ${SRCDIR} ${INCDIR} ${TESTDIR} ${SRCDIR}/main.cpp configure 
+init: .git ${SRCDIR} ${INCDIR} ${TESTDIR} ${MAINDIR}/main.cpp ${TESTDIR}/tstmain.cpp configure 
 
 configure:
 	@cmake -S . -B ${BINDIR}                     \
@@ -84,6 +85,8 @@ ${SRCDIR} ${INCDIR} ${TESTDIR}:
 CMakeLists.txt:
 	@curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/cpp_templ2/CMakeLists.txt' > $@
 
-${SRCDIR}/main.cpp:
+${MAINDIR}/main.cpp:
 	@curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/main.cpp' > $@
+${TESTDIR}/tstmain.cpp:
+	@touch $@
 #-----------------------------------------------------------------
