@@ -28,6 +28,7 @@ FetchContent_MakeAvailable(googletest)
 
 file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/main/src/**")
 file(GLOB_RECURSE TEST_FILES "${PROJECT_SOURCE_DIR}/test/**")
+file(GLOB_RECURSE INC_FILES "${PROJECT_SOURCE_DIR}/main/include/**")
 
 # TESTING ---------------------
 enable_testing()
@@ -41,7 +42,7 @@ target_include_directories("${TEST_NAME}" PUBLIC
 )
 
 # BUILDING MAIN ---------------
-add_executable("${PROJECT_NAME}" "${MAIN_FILE}" "${SRC_FILES}")
+add_executable("${PROJECT_NAME}" "${MAIN_FILE}" "${SRC_FILES}" "${INC_FILES}")
 target_include_directories("${PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/main/include"
     "${CMAKE_CURRENT_SOURCE_DIR}"
