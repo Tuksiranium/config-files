@@ -30,20 +30,17 @@ file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/main/src/**")
 file(GLOB_RECURSE TEST_FILES "${PROJECT_SOURCE_DIR}/test/**")
 file(GLOB_RECURSE INC_FILES "${PROJECT_SOURCE_DIR}/main/include/**")
 
+include_directories(
+    "${CMAKE_CURRENT_SOURCE_DIR}/main/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
 # TESTING ---------------------
 enable_testing()
 add_executable("${TEST_NAME}" "${TEST_FILES}" "${SRC_FILES}")
 target_link_libraries("${TEST_NAME}" GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests("${TEST_NAME}")
-target_include_directories("${TEST_NAME}" PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/main/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-)
 
 # BUILDING MAIN ---------------
-add_executable("${PROJECT_NAME}" "${MAIN_FILE}" "${SRC_FILES}" "${INC_FILES}")
-target_include_directories("${PROJECT_NAME}" PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/main/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-)
+add_executable("${PROJECT_NAME}" "${MAIN_FILE}" "${SRC_FILES}")
