@@ -24,42 +24,65 @@ else
 	CMAKE_OPT = ${CMAKE_DEBUG_OPT}
 	CMAKE_BUILD_DIR = ${DEBUG_DIR}
 endif
+
+VERBOSE = 0
+ifeq (${VERBOSE}, 0)
+	H = @
+endif
+
 #------------------------------------------------------------------------------
 
-.PHONY: all build run memcheck configure clean clean_all doc
+.PHONY: all build run memcheck configure clean clean_all renew_config doc init
 
 #- BUILD, RUN, DEBUG ----------------------------------------------------------
 all build ${CMAKE_BUILD_DIR}/${TARGET}:
-	cmake --build ${CMAKE_BUILD_DIR} --target ${TARGET} -j 12
+	$(H)cmake --build ${CMAKE_BUILD_DIR} --target ${TARGET} -j 12
 
 run: ${CMAKE_BUILD_DIR}/${TARGET}
-	@./$^
+	$(H)@./$^
 
 memcheck: ${CMAKE_BUILD_DIR}/${TARGET}
-	valgrind --leak-check=full $^
+	$(H)valgrind --leak-check=full $^
 #------------------------------------------------------------------------------
 
 #- UTILS ----------------------------------------------------------------------
 configure: ${CMAKE_BUILD_DIR}
-	cmake							\
+	$(H)cmake						\
 	-DCMAKE_BUILD_TYPE=${MODE}				\
 	-DCMAKE_MAKE_PROGRAM=${GENERATOR}			\
 	-DCMAKE_EXPORT_COMPILE_COMMANDS=${LINK_COMPILE_CMD}	\
 	${CMAKE_OPT} -G ${GENERATOR_FULL} -S . -B $^
 ifeq (${LINK_COMPILE_CMD}, 1)
-	ln -s ./bin/debug/compile_commands.json .
+	$(H)ln -s ./bin/debug/compile_commands.json .
 endif
 
 ${CMAKE_BUILD_DIR}:
-	mkdir -p $@
+	$(H)mkdir -p $@
 
 clean:
-	${GENERATOR} -C ${CMAKE_BUILD_DIR} clean
+	$(H)${GENERATOR} -C ${CMAKE_BUILD_DIR} clean
 
 clean_all:
-	rm -rf ./bin
+	$(H)rm -rf ./bin
+
+renew_config: clean_all configure
 
 doc:
-	doxygen
+	$(H)doxygen
+#------------------------------------------------------------------------------
+
+#- INITIALISATION -------------------------------------------------------------
+STRUCT_DIRS = src include
+init:
+	$(H)mkdir -p ${STRUCT_DIRS}
+	$(H)curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/cpp_templ3/CMakeLists.txt' > CMakeLists.txt
+	$(H)sed -i "3s/project-name/${TARGET}/" CMakeLists.txt
+	$(H)sed -i "6s/main.cpp/${TARGET}.cpp/" CMakeLists.txt
+	$(H)curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/cpp_templ3/main.cpp' > src/${TARGET}.cpp
+	$(H)sed -i "4s/project-name/${TARGET}/" src/${TARGET}.cpp
+	$(H)curl 'https://raw.githubusercontent.com/Tuksiranium/config-files/master/code-templ/cpp_templ3/gitignore' > .gitignore
+	$(H)echo "# ${TARGET} (cpp project)" > README.md
+	$(H)git init && git add . && git commit -m "init ${TARGET}"
+	$(H)$(MAKE) configure
 #------------------------------------------------------------------------------
 
